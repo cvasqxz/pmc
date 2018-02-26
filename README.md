@@ -11,5 +11,8 @@ Those proposing changes should consider that ultimately consent may rest with th
 
 PMC will follow [Bitcoin's BIP](https://github.com/bitcoin/bips/blob/master/bip-0002.mediawiki) but in a more flexible way.
 
-|Number|	Layer| 	Title| 	Owner| 	Type| 	Status
+See [Template File](template.mediawiki) For example PMC.
+
+|Number| Layer| Title|  Owner| Type| Status
 | ---  |    --- | ---  |   --- | ---  | --- |
+|[1](pmc-0001.mediawiki)| - | Implement new Icon | Chaucha Team | - | Active

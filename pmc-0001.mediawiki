@@ -1,0 +1,26 @@
+<pre>
+ PMC: 0001
+ Layer: None
+ Title: Implement new Icon
+ Author: Camilo Castro <camilo@chaucha.cl>
+ Status: Active
+ Type: Informational
+ Created: 2018-02-26
+ License: BSD 2-clause license.
+</pre>
+
+==Abstract==
+Implement the new chaucha image to the icon used in desktop applications.
+
+==Copyright==
+
+This PMC is licensed under the BSD 2-clause license.
+
+==Motivation==
+
+Standarize the chaucha image to match the new logo, creating a more professional
+look and feel.
+
+==Example==
+
+<img src="pmc-0001/chaucha.svg"></img>
