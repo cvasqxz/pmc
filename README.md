@@ -15,4 +15,4 @@ See [Template File](template.mediawiki) For example PMC.
 
 |Number| Layer| Title|  Owner| Type| Status
 | ---  |    --- | ---  |   --- | ---  | --- |
-|[1](pmc-0001.mediawiki)| - | Implement new Icon | Chaucha Team | - | Active
+|[1](pmc-0001.mediawiki)| - | Implement new Icon | Chaucha Team | Informational | Proposed
