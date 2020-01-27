@@ -1,6 +1,6 @@
 <pre>
  PMC: 0002
- Layer: Consensus (soft fork)
+ Layer: Consensus (hard fork)
  Title: ScryptCHA
  Author: César <cesar@chaucha.cl>
  Status: Draft
