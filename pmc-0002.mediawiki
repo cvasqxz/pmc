@@ -1,7 +1,7 @@
 <pre>
  PMC: 0002
  Layer: Consensus (soft fork)
- Title: Modificación de algoritmo Scrypt
+ Title: ScryptCHA
  Author: César <cesar@chaucha.cl>
  Status: Draft
  Type: Standard
