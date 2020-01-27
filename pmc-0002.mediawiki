@@ -11,9 +11,9 @@
 
 ==Introducción==
 
-La función [https://www.tarsnap.com/scrypt/scrypt.pdf Scrypt] está definida de la siguiente manera:
+Este documento describe una propuesta de cambio de la constante N en la función Scrypt en la Chauchera para crear un nuevo algoritmo de minería que hemos llamado ScryptCHA, que permitirá descentralizar el proceso de generación de bloques de la Red Chaucha mediante la individualización del algoritmo de minería.
 
-''scrypt(P, S, N, r, p, dkLen) = MFcrypt<sub>HMAC_SHA256,SMix<sub>r</sub></sub>(P, S, N, p, dkLen) 	''
+==Motivación==
 
 {| 
 !nHeight
@@ -61,3 +61,29 @@ La función [https://www.tarsnap.com/scrypt/scrypt.pdf Scrypt] está definida de
 |20000000 
 |[https://explorer.cha.terahash.cl/block/6fe0d6be185bb2249fddb09bc0bc9243f0d950fc16f8f23255ccac7c5676c02e 6fe0d6be185bb2249fddb09bc0bc9243f0d950fc16f8f23255ccac7c5676c02e]
 |}
+
+==ScryptCHA==
+
+La función [https://www.tarsnap.com/scrypt/scrypt.pdf Scrypt] está definida de la siguiente manera:
+
+''scrypt(P, S, N, r, p, dkLen) = MFcrypt<sub>HMAC_SHA256,SMix<sub>r</sub></sub>(P, S, N, p, dkLen) 	''
+
+En donde N se define como '''CPU/memory cost parameter''', en base a la relación entre el costo de ejecución de la función Scrypt con respecto al requisito de memoria que exige el algoritmo.
+
+La implementación de la función Scrypt en Litecoin se realizó con un '''N = 1024''' para no sobrecargar los nodos con la validación del ''PoW Hash'' de cada bloque minado, pero este valor de ''CPU/Memory Cost'' puede ser aumentado gracias a las capacidades de hardware existentes en la actualidad.
+
+Este cambio se puede realizar con un simple ''refactoring'' de la función presente en [https://github.com/proyecto-chaucha/chauchera/blob/master/src/crypto/scrypt.cpp#L328 src/crypto/scrypt.cpp], modificando el tamaño del '''SCRYPT_SCRATCHPAD_SIZE''' y los rangos que utilizan esta constante.
+
+<source lang="c++">
+void scrypt_1024_1_1_256(const char *input, char *output)
+{
+	char scratchpad[1024*128 + 63];
+    scrypt_1024_1_1_256_sp(input, output, scratchpad, 1024);
+}
+
+void ScryptCHA(const char *input, char *output)
+{
+	char scratchpad[(1 << (14 + 1))*128+ 63];
+    scrypt_1024_1_1_256_sp(input, output, scratchpad,  (1 << (14 + 1)));
+}
+</source>
