@@ -1,26 +1,67 @@
 <pre>
  PMC: 0001
- Layer: None
- Title: Implement new Icon
- Author: Camilo Castro <camilo@chaucha.cl>
- Status: Active
- Type: Informational
- Created: 2018-02-26
+ Layer: Consensus (soft fork)
+ Title: Cambios de generación, OP_RETURN y DGW
+ Author: César <cesar@chaucha.cl>
+ Status: Final
+ Type: Standard
+ Created: 2018-03-08
  License: BSD 2-clause license.
 </pre>
 
-==Abstract==
-Implement the new chaucha image to the icon used in desktop applications.
 
-==Copyright==
+==Introducción==
+Estas últimas semanas hemos tenido varias conversaciones sobre los distintos cambios que deseamos implementar en el código fuente de Chaucha, lo que ha generado opiniones encontradas dentro de la comunidad. Por esto, decidí presentar una propuesta formal, entendible y justificada para canalizar estas ideas y permitir que exista una discusión pública y abierta sobre estos temas sensibles, y si se llega a un consenso, lograr transformar esta propuesta en un cambio a la red de Chaucha.
 
-This PMC is licensed under the BSD 2-clause license.
+A continuación presentaré los tres puntos a discutir que conforman la Propuesta de Mejora para Chaucha (PMC) #1.
 
-==Motivation==
+* 1. Ajuste al algoritmo DGW
+* 2. Aumento de tamaño del OP_RETURN
+* 3. Cambio a la generación de Chauchas
 
-Standarize the chaucha image to match the new logo, creating a more professional
-look and feel.
+==Algoritmo DGW==
 
-==Example==
+El primer gran cambio realizado a la red de Chaucha fue la implementación del algoritmo Dark Gravity Wave, que permitió ajustar la dificultad de minado por cada bloque que genera la red. Gracias a este cambio se logró una estabilidad en el funcionamiento de Chaucha que no se observaba desde los inicios de la red, cumpliendo todas las expectativas del grupo de desarrolladores que ejecutaron esta actualización.
 
-<img src="pmc-0001/chaucha.svg"></img>
+En la actualidad la red genera diariamente más del 96% de los bloques presupuestados, lo que es un gran avance al funcionamiento y la estabilidad de la misma.
+
+Pese a esto, se ha observado un pequeño problema que no se logró prevenir con la implementación del algoritmo DGW, que fue la cantidad de bloques anteriores necesarios para realizar el calculo de dificultad del siguiente bloque. Este problema permite que todavía sea posible atacar la red en pequeños intervalos de tiempo, realizando estancamientos que no duran mas de 15 minutos, pero que no deberían existir si se logra calibrar el algoritmo.
+
+Actualmente se realiza el cálculo de dificultad con los últimos 24 bloques generados en la red, pero se podrían obtener mejores resultados al disminuir este número a un valor de entre 10 y 20 sin poner en riesgo la estabilidad y el funcionamiento correcto de la red.
+
+Por este motivo, la primera propuesta incluida en la PMC #1 es disminuir el número de bloques para realizar el calculo de dificultad a 14.
+
+==OP_RETURN==
+Estas últimas semanas hemos iniciado una importante investigación con respecto a la utilización del opcode OP_RETURN para almacenar información en la red de Chaucha, lo que ha generado varias ideas de sistemas a implementar que aprovechen las características intrínsecas de la tecnología Blockchain para almacenar información inmutable en el tiempo.
+
+Para mas información sobre esta investigación te recomiendo visitar la página web de Chaucha IoT, que mantiene en funcionamiento una demostración de un sistema de monitoreo de temperatura y humedad utilizando el blockchain de Chaucha.
+
+La segunda propuesta incluida en el PMC #1 es aumentar el tamaño que permite almacenar el opcode OP_RETURN de 80 a 200 bytes, lo que facilitaría la utilización de este elemento para almacenar información.
+
+==Generación==
+Este punto generó opiniones encontradas dentro de los desarrolladores y colaboradores del Proyecto Chaucha, pero es necesario discutirlo de manera pública y transparente para llegar a un consenso.
+
+En los inicios de la creación de Chaucha se definieron parámetros que establecen la generación de Chauchas en la red, que son el Max Supply de 123.456.789 CHA, la tasa de generación de 10 CHA por minuto y el halving (disminución de la tasa de generación a la mitad) cada dos años.
+
+Anteriormente realizamos un cambio a la tasa de generación por una ecuación variable desde el bloque #2835 hasta el bloque #50.000, lo que permitió incentivar la minería de Chauchas en el primer mes de la red.
+
+La elección de estos parámetros fue al azar, y al analizar el funcionamiento de la red hemos descubierto varios problemas derivados de esta elección.
+
+El primer problema es el Max Supply real de la red, ya que solo se generarán 21 millones de Chauchas en un periodo de 100 años si no se realizan cambios a los parámetros establecidos.
+
+El segundo problema son las 14.400 Chauchas que se generan diariamente, que produce una gran volatilidad en el mercado y no permite valorizar la Chaucha de manera correcta con respecto al Peso Chileno.
+
+El mercado Chileno no soporta esta tasa de generación, y cada día se puede observar en el mercado el problema derivado a esta mala elección de parametros.
+
+Por esto, proponemos tres cambios fundamentales al funcionamiento en el tiempo de la Chaucha, que son el cambio al Max Supply, la tasa de generación y el número de bloques para ejecutar el Halving.
+
+La última propuesta del PMC #1 establece una tasa de generación de 1.5 CHA por cada bloque, que será disminuida a la mitad cada 5 años y que mantendrá un Max Supply de 10 millones de Chauchas.
+
+Con este cambio se establecerá una tasa de generación diaria de 2.160 CHA y se estima que en 100 años se generarán 9.672.777 CHA, lo que permitirá valorizar la Chaucha de una mejor manera con respecto a su impuesto de minería y al Peso Chileno.
+
+La aplicación de este cambio produciría un efecto en el mercado de Chauchas y en la valorización de la criptomoneda, ya que sería 6.67 veces más difícil (y más caro) minar una Chaucha. Por este motivo, es necesario mantener una discusión abierta sobre las posibles repercusiones que generaría esta implementación en la visión pública y económica de la Chaucha.
+
+==Conclusión==
+Es posible realizar una gran cantidad de cambios al funcionamiento de la red de Chaucha, pero es necesario discutir las ideas, pensarlas bien e implementarlas cuando se estudien y sean aprobadas por la comunidad.
+
+Cualquier usuario puede generar una PMC si se documenta correctamente y se presenta de una manera clara, entendible y transparente a la comunidad, y espero que este post inspire a mas personas a realizar propuestas para hacer de Chaucha una mejor criptomoneda.
