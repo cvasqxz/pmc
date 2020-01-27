@@ -1,0 +1,11 @@
+<pre>
+ PMC: 0002
+ Layer: Consensus (soft fork)
+ Title: Modificación de algoritmo Scrypt
+ Author: César <cesar@chaucha.cl>
+ Status: Draft
+ Type: Standard
+ Created: 2020-01-27
+ License: BSD 2-clause license.
+</pre>
+
