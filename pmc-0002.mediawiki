@@ -23,41 +23,41 @@ La función [https://www.tarsnap.com/scrypt/scrypt.pdf Scrypt] está definida de
 |-
 |0
 |1
-|0x00000001
+|00000001
 |[https://explorer.cha.terahash.cl/block/6e27bffd2a104bea1c870be76aab1cce13bebb0db40606773827517da9528174 6e27bffd2a104bea1c870be76aab1cce13bebb0db40606773827517da9528174] 
 |-
 |1
 |2
-|0x00000002
+|00000002
 |[https://explorer.cha.terahash.cl/block/eadcbcb3f8960778b1c39415d1447a5cb45981ac15b269e31924f5f4701ea0e8 eadcbcb3f8960778b1c39415d1447a5cb45981ac15b269e31924f5f4701ea0e8]
 |-
 |144878 
 |536870912 
-|0x20000000 
+|20000000 
 |[https://explorer.cha.terahash.cl/block/f53292f5fdf64fae715b92e06c0804c64541c6121f6942bc9c2afcb2d3010d4e f53292f5fdf64fae715b92e06c0804c64541c6121f6942bc9c2afcb2d3010d4e] 
 |-
 |144884
 |2
-|0x00000002 
+|00000002 
 |[https://explorer.cha.terahash.cl/block/f383077bbc26e0e88bef93c58b30357bbe9c87dd65a74f3ca8546a12d07ba40c f383077bbc26e0e88bef93c58b30357bbe9c87dd65a74f3ca8546a12d07ba40c]
 |-
 |145141 
 |536870912 
-|0x20000000 
+|20000000 
 |[https://explorer.cha.terahash.cl/block/c9d7f827718acccd2accda07c983fd9cccace261aa530873aa3cbfa4cd39274f c9d7f827718acccd2accda07c983fd9cccace261aa530873aa3cbfa4cd39274f]
 |-
 |145143 
 |2 
-|0x00000002 
+|00000002 
 |[https://explorer.cha.terahash.cl/block/8b2551959cd16fa6431df2cb9dfb9b8754c8ebd29853b5f7b804e2bfa1b1fc5c 8b2551959cd16fa6431df2cb9dfb9b8754c8ebd29853b5f7b804e2bfa1b1fc5c]
 |-
 |145167 
 |536870915 
-|0x20000003 
+|20000003 
 |[https://explorer.cha.terahash.cl/block/8ca157ba0aea00f816d75149d0e8616a5e9dfa2fdd0c380e601038a9f0692774 8ca157ba0aea00f816d75149d0e8616a5e9dfa2fdd0c380e601038a9f0692774]
 |-
 |153216 
 |536870912 
-|0x20000000 
+|20000000 
 |[https://explorer.cha.terahash.cl/block/6fe0d6be185bb2249fddb09bc0bc9243f0d950fc16f8f23255ccac7c5676c02e 6fe0d6be185bb2249fddb09bc0bc9243f0d950fc16f8f23255ccac7c5676c02e]
 |}
