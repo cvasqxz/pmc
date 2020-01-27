@@ -9,3 +9,5 @@
  License: BSD 2-clause license.
 </pre>
 
+[https://www.tarsnap.com/scrypt/scrypt.pdf Stronger key derivation via secuential memory-hard functions]
+_scrypt(P, S, N, r, p, dkLen) = MFcrypt<sub>HMAC_SHA256,SMix<sub>r</sub></sub>(P, S, N, p, dkLen)_
