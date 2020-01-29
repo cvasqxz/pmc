@@ -11,7 +11,7 @@
 
 ==Introducción==
 
-Este documento describe una propuesta de cambio de la constante N en la función Scrypt en la Chauchera para crear un nuevo algoritmo de minería que hemos llamado ScryptCHA, que permitirá descentralizar el proceso de generación de bloques de la Red Chaucha mediante la individualización del algoritmo de minería.
+Este documento describe una propuesta de cambio de la constante N de la función Scrypt en la Chauchera, a modo de crear un nuevo algoritmo de minería que hemos llamado ScryptCHA. Este cambio que permitirá descentralizar el proceso de generación de bloques de la Red Chaucha, mediante la individualización y diferenciación del algoritmo de minería de la Red Chaucha con respecto a los demás proyectos de criptomonedas activos en la actualidad.
 
 ==Motivación==
 
@@ -64,7 +64,7 @@ Este documento describe una propuesta de cambio de la constante N en la función
 
 ==ScryptCHA==
 
-La función [https://www.tarsnap.com/scrypt/scrypt.pdf Scrypt] está definida de la siguiente manera:
+La función [https://www.tarsnap.com/scrypt/scrypt.pdf Scrypt] se representa de la siguiente manera:
 
 ''scrypt(P, S, N, r, p, dkLen) = MFcrypt<sub>HMAC_SHA256,SMix<sub>r</sub></sub>(P, S, N, p, dkLen) 	''
 
@@ -87,3 +87,4 @@ void ScryptCHA(const char *input, char *output, int N)
     scrypt_1024_1_1_256_sp(input, output, scratchpad, N);
 }
 </source>
+
