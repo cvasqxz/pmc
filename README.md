@@ -16,3 +16,4 @@ See [Template File](template.mediawiki) For example PMC.
 |Number| Layer| Title|  Owner| Type| Status
 | ---  |    --- | ---  |   --- | ---  | --- |
 |[1](pmc-0001.mediawiki)| Consensus (soft fork) | Cambios de generación, OP_RETURN y DGW | [César](https://github.com/cvasqxz/) | Standard | Final
+|[2](pmc-0002.mediawiki)| Consensus (hard fork) | ScryptCHA | [César](https://github.com/cvasqxz/) | Standard | draft
