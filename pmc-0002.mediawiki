@@ -11,56 +11,19 @@
 
 ==Introducción==
 
-Este documento describe una propuesta de cambio de la constante N de la función Scrypt en la Chauchera, a modo de crear un nuevo algoritmo de minería que hemos llamado ScryptCHA. Este cambio que permitirá descentralizar el proceso de generación de bloques de la Red Chaucha, mediante la individualización y diferenciación del algoritmo de minería de la Red Chaucha con respecto a los demás proyectos de criptomonedas activos en la actualidad.
+Este documento describe una propuesta de cambio de la constante N de la función Scrypt en la Chauchera, a modo de crear un nuevo algoritmo de minería que hemos llamado ScryptCHA. Este cambio permitirá descentralizar el proceso de generación de bloques de la Red Chaucha mediante la individualización y diferenciación del algoritmo de minería de la Red Chaucha con respecto a los demás proyectos de criptomonedas activos en la actualidad.
 
 ==Motivación==
 
-{| 
-!nHeight
-!nVersion (dec)
-!nVersion (hex)
-!Hash
-|-
-|0
-|1
-|00000001
-|[https://explorer.cha.terahash.cl/block/6e27bffd2a104bea1c870be76aab1cce13bebb0db40606773827517da9528174 6e27bffd2a104bea1c870be76aab1cce13bebb0db40606773827517da9528174] 
-|-
-|1
-|2
-|00000002
-|[https://explorer.cha.terahash.cl/block/eadcbcb3f8960778b1c39415d1447a5cb45981ac15b269e31924f5f4701ea0e8 eadcbcb3f8960778b1c39415d1447a5cb45981ac15b269e31924f5f4701ea0e8]
-|-
-|144878 
-|536870912 
-|20000000 
-|[https://explorer.cha.terahash.cl/block/f53292f5fdf64fae715b92e06c0804c64541c6121f6942bc9c2afcb2d3010d4e f53292f5fdf64fae715b92e06c0804c64541c6121f6942bc9c2afcb2d3010d4e] 
-|-
-|144884
-|2
-|00000002 
-|[https://explorer.cha.terahash.cl/block/f383077bbc26e0e88bef93c58b30357bbe9c87dd65a74f3ca8546a12d07ba40c f383077bbc26e0e88bef93c58b30357bbe9c87dd65a74f3ca8546a12d07ba40c]
-|-
-|145141 
-|536870912 
-|20000000 
-|[https://explorer.cha.terahash.cl/block/c9d7f827718acccd2accda07c983fd9cccace261aa530873aa3cbfa4cd39274f c9d7f827718acccd2accda07c983fd9cccace261aa530873aa3cbfa4cd39274f]
-|-
-|145143 
-|2 
-|00000002 
-|[https://explorer.cha.terahash.cl/block/8b2551959cd16fa6431df2cb9dfb9b8754c8ebd29853b5f7b804e2bfa1b1fc5c 8b2551959cd16fa6431df2cb9dfb9b8754c8ebd29853b5f7b804e2bfa1b1fc5c]
-|-
-|145167 
-|536870915 
-|20000003 
-|[https://explorer.cha.terahash.cl/block/8ca157ba0aea00f816d75149d0e8616a5e9dfa2fdd0c380e601038a9f0692774 8ca157ba0aea00f816d75149d0e8616a5e9dfa2fdd0c380e601038a9f0692774]
-|-
-|153216 
-|536870912 
-|20000000 
-|[https://explorer.cha.terahash.cl/block/6fe0d6be185bb2249fddb09bc0bc9243f0d950fc16f8f23255ccac7c5676c02e 6fe0d6be185bb2249fddb09bc0bc9243f0d950fc16f8f23255ccac7c5676c02e]
-|}
+La Red Chaucha fue creada como un ejercicio de aprendizaje autodidacta, en donde se estableció que Chaucha sería una criptomoneda sandbox que permitiera a los usuarios aprender y desarrollar software de manera libre, gratuita, autodidacta y descentralizada.
+
+A poco tiempo de la inauguración de la Red Chaucha observamos la necesidad de realizar una serie de actualizaciones cada cierto tiempo, a modo de asegurar que su funcionamiento se mantenga estable a través del tiempo, y por este motivo nació la idea de crear las Propuestas de Mejora para Chaucha (PMC) como una herramienta de administración de las ideas que se desean implementar en la red.
+
+Hasta este momento se han implementado dos grandes cambios a la Red Chaucha, que fueron el cambio del algoritmo de cálculo de dificultad (PMC 0) y la reestructuración de la generación de Chauchas en el tiempo (PMC 1), que ayudaron a limitar la explotación de la minería de Chauchas, pero pese a estos cambios, todavía podemos observar que la generación de bloques en la red es vulnerable a ataques del 51%.
+
+Este problema nace a partir de la facilidad para arrendar grandes cantidades de poder de minado a través del Cloud Mining, lo que permite que un único usuario pueda obtener más del 50% del poder de minado total de la red, tomando el control de la creación del blockchain de la Chaucha. A causa de la posibilidad de arrendar poder de minado, hemos podido observar que la minería de chauchas pasó de ser un esfuerzo comunitario a una competencia de 3 a 4 usuarios que fácilmente pueden censurar transacciones o realizar ataques como el timewarp, chain reorg o selfish mining.
+
+En base a este problema, propongo individualizar la implementación del algoritmo Scrypt en la Red Chaucha modificando la constante N, a modo de que sea imposible arrendar poder de minado con el Cloud Mining.
 
 ==ScryptCHA==
 
@@ -87,6 +50,8 @@ void ScryptCHA(const char *input, char *output, int N)
     scrypt_1024_1_1_256_sp(input, output, scratchpad, N);
 }
 </source>
+
+==Testing==
 
 {| 
 !N
@@ -152,4 +117,53 @@ void ScryptCHA(const char *input, char *output, int N)
 |32768
 |11.9317
 |83.8105
+|}
+
+==Activación==
+
+{| 
+!nHeight
+!nVersion (dec)
+!nVersion (hex)
+!Hash
+|-
+|0
+|1
+|00000001
+|[https://explorer.cha.terahash.cl/block/6e27bffd2a104bea1c870be76aab1cce13bebb0db40606773827517da9528174 6e27bffd2a104bea1c870be76aab1cce13bebb0db40606773827517da9528174] 
+|-
+|1
+|2
+|00000002
+|[https://explorer.cha.terahash.cl/block/eadcbcb3f8960778b1c39415d1447a5cb45981ac15b269e31924f5f4701ea0e8 eadcbcb3f8960778b1c39415d1447a5cb45981ac15b269e31924f5f4701ea0e8]
+|-
+|144878 
+|536870912 
+|20000000 
+|[https://explorer.cha.terahash.cl/block/f53292f5fdf64fae715b92e06c0804c64541c6121f6942bc9c2afcb2d3010d4e f53292f5fdf64fae715b92e06c0804c64541c6121f6942bc9c2afcb2d3010d4e] 
+|-
+|144884
+|2
+|00000002 
+|[https://explorer.cha.terahash.cl/block/f383077bbc26e0e88bef93c58b30357bbe9c87dd65a74f3ca8546a12d07ba40c f383077bbc26e0e88bef93c58b30357bbe9c87dd65a74f3ca8546a12d07ba40c]
+|-
+|145141 
+|536870912 
+|20000000 
+|[https://explorer.cha.terahash.cl/block/c9d7f827718acccd2accda07c983fd9cccace261aa530873aa3cbfa4cd39274f c9d7f827718acccd2accda07c983fd9cccace261aa530873aa3cbfa4cd39274f]
+|-
+|145143 
+|2 
+|00000002 
+|[https://explorer.cha.terahash.cl/block/8b2551959cd16fa6431df2cb9dfb9b8754c8ebd29853b5f7b804e2bfa1b1fc5c 8b2551959cd16fa6431df2cb9dfb9b8754c8ebd29853b5f7b804e2bfa1b1fc5c]
+|-
+|145167 
+|536870915 
+|20000003 
+|[https://explorer.cha.terahash.cl/block/8ca157ba0aea00f816d75149d0e8616a5e9dfa2fdd0c380e601038a9f0692774 8ca157ba0aea00f816d75149d0e8616a5e9dfa2fdd0c380e601038a9f0692774]
+|-
+|153216 
+|536870912 
+|20000000 
+|[https://explorer.cha.terahash.cl/block/6fe0d6be185bb2249fddb09bc0bc9243f0d950fc16f8f23255ccac7c5676c02e 6fe0d6be185bb2249fddb09bc0bc9243f0d950fc16f8f23255ccac7c5676c02e]
 |}
