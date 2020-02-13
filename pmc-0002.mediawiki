@@ -21,37 +21,154 @@ A poco tiempo de la inauguración de la Red Chaucha observamos la necesidad de r
 
 Hasta este momento se han implementado dos grandes cambios a la Red Chaucha, que fueron el cambio del algoritmo de cálculo de dificultad (PMC 0) y la reestructuración de la generación de Chauchas en el tiempo (PMC 1), que ayudaron a limitar la explotación de la minería de Chauchas, pero pese a estos cambios, todavía podemos observar que la generación de bloques en la red es vulnerable a ataques del 51%.
 
-Este problema nace a partir de la facilidad para arrendar grandes cantidades de poder de minado a través del Cloud Mining, lo que permite que un único usuario pueda obtener más del 50% del poder de minado total de la red, tomando el control de la creación del blockchain de la Chaucha. A causa de la posibilidad de arrendar poder de minado, hemos podido observar que la minería de chauchas pasó de ser un esfuerzo comunitario a una competencia de 3 a 4 usuarios que fácilmente pueden censurar transacciones o realizar ataques como el timewarp, chain reorg o selfish mining.
+Este problema nace a partir de la facilidad para arrendar grandes cantidades de poder de minado a través del Cloud Mining, lo que permite que un único usuario pueda obtener más del 50% del poder de minado total de la red, tomando el control de la creación del blockchain de la Chaucha. A causa de esto, hemos podido observar que la minería de chauchas pasó de ser un esfuerzo comunitario a una competencia de 3 a 4 usuarios que fácilmente pueden censurar transacciones o realizar ataques como el timewarp, chain reorg o selfish mining.
 
-En base a este problema, propongo individualizar la implementación del algoritmo Scrypt en la Red Chaucha modificando la constante N, a modo de que sea imposible arrendar poder de minado con el Cloud Mining.
+<img src="pmc-0002/pool-distribution.png"></img>
 
-==ScryptCHA==
+Por este motivo propongo individualizar la implementación del algoritmo Scrypt en la Chauchera modificando la constante N, a modo de que sea imposible arrendar poder de minado con Cloud Mining, y así permitir la descentralización de la creación de bloques en el Blockchain de la Red Chaucha.
 
-La función [https://www.tarsnap.com/scrypt/scrypt.pdf Scrypt] se representa de la siguiente manera:
+==Algoritmo Scrypt==
 
-''scrypt(P, S, N, r, p, dkLen) = MFcrypt<sub>HMAC_SHA256,SMix<sub>r</sub></sub>(P, S, N, p, dkLen) 	''
+En el whitepaper de la función [https://www.tarsnap.com/scrypt/scrypt.pdf Scrypt] se representa al algoritmo de la siguiente manera:
+
+''scrypt(P, S, N, r, p, dkLen) = MFcrypt<sub>HMAC_SHA256,SMix<sub>r</sub></sub>(P, S, N, p, dkLen)     ''
 
 En donde N se define como '''CPU/memory cost parameter''', en base a la relación entre el costo de ejecución de la función Scrypt con respecto al requisito de memoria que exige el algoritmo.
 
 La implementación de la función Scrypt en Litecoin se realizó con un '''N = 1024''' para no sobrecargar los nodos con la validación del ''PoW Hash'' de cada bloque minado, pero este valor de ''CPU/Memory Cost'' puede ser aumentado gracias a las capacidades de hardware existentes en la actualidad.
 
-Este cambio se puede realizar con un simple ''refactoring'' de la función presente en [https://github.com/proyecto-chaucha/chauchera/blob/master/src/crypto/scrypt.cpp#L328 src/crypto/scrypt.cpp], modificando el tamaño del '''SCRYPT_SCRATCHPAD_SIZE''' y los rangos que utilizan esta constante.
+Este cambio se puede realizar con un simple ''refactoring'' de la función presente en [https://github.com/proyecto-chaucha/chauchera/blob/master/src/crypto/scrypt.cpp#L328 src/crypto/scrypt.cpp].
 
 <source lang="c++">
-void scrypt_1024_1_1_256(const char *input, char *output)
-{
-    char scratchpad[1024*128 + 63];
-    scrypt_1024_1_1_256_sp(input, output, scratchpad, 1024);
-}
+void scrypt_N_1_1_256_sp_generic(const char *input, char *output, char *scratchpad, unsigned int N) {
+    uint8_t B[128];
+    uint32_t X[32];
+    uint32_t *V;
+    uint32_t i, j, k;
 
-void ScryptCHA(const char *input, char *output, int N)
-{
-    char scratchpad[N*128 + 63];
-    scrypt_1024_1_1_256_sp(input, output, scratchpad, N);
+    V = (uint32_t *)(((uintptr_t)(scratchpad) + 63) & ~ (uintptr_t)(63));
+
+    PBKDF2_SHA256((const uint8_t *)input, 80, (const uint8_t *)input, 80, 1, B, 128);
+
+    for (k = 0; k < 32; k++)
+        X[k] = le32dec(&B[4 * k]);
+
+    for (i = 0; i < N; i++) {
+        memcpy(&V[i * 32], X, 128);
+        xor_salsa8(&X[0], &X[16]);
+        xor_salsa8(&X[16], &X[0]);
+    }
+
+    for (i = 0; i < N; i++) {
+        j = 32 * (X[16] & (N-1));
+        for (k = 0; k < 32; k++)
+            X[k] ^= V[j + k];
+        xor_salsa8(&X[0], &X[16]);
+        xor_salsa8(&X[16], &X[0]);
+    }
+
+    for (k = 0; k < 32; k++)
+        le32enc(&B[4 * k], X[k]);
+
+    PBKDF2_SHA256((const uint8_t *)input, 80, B, 128, 1, (uint8_t *)output, 32);
 }
 </source>
 
-==Testing==
+Con este cambio es posible transformar a la constante N en una variable, que puede ser adaptada automáticamente por la misma red de criptomonedas (por ejemplo, con las variaciones de poder de minado), o con una PMC que produzca un hard-fork (actualización) de la red.
+
+==Activación del cambio==
+
+La activación de un cambio en la constante N presenta dos factores importantes que ponen en riesgo la estabilidad del Blockchain, que son dificultad de la red en el bloque de activación del cambio y la carga de ''CPU/Memory Cost'' que presenta el cambio de la constante N.
+
+===Dificultad===
+
+Cuando se reajuste la constante N la Red Chaucha dejará de ser compatible con la maquinaria especifica para minar Litecoin disponible por Cloud Mining, lo que producirá una importante variación en el poder de minado total de la red, y este evento puede ser una oportunidad para que un atacante suba artificialmente la dificultad de la red para que el bloque de activación, que debe ser minado con el nuevo algoritmo, no pueda ser descubierto nunca, haciendo que la Red Chaucha se estanque para siempre.
+
+Por este motivo propongo que la versión de los bloques minados con el nuevo algoritmo sea 0x30000000, a modo de poder identificarlos fácilmente en el proceso de Proof of Work, y que además exista una ventana de 24 bloques luego de la activación del fork que fije artificialmente la dificultad de la red a su minimo historico, para que la Red Chaucha vuelva a reajustar su dificultad naturalmente al nuevo poder de minado presente luego de la activación del hard fork.
+
+{| 
+!nHeight
+!nVersion (dec)
+!nVersion (hex)
+!Hash
+|-
+|0
+|1
+|00000001
+|[https://explorer.cha.terahash.cl/block/6e27bffd2a104bea1c870be76aab1cce13bebb0db40606773827517da9528174 6e27bffd2a104bea1c870be76aab1cce13bebb0db40606773827517da9528174] 
+|-
+|1
+|2
+|00000002
+|[https://explorer.cha.terahash.cl/block/eadcbcb3f8960778b1c39415d1447a5cb45981ac15b269e31924f5f4701ea0e8 eadcbcb3f8960778b1c39415d1447a5cb45981ac15b269e31924f5f4701ea0e8]
+|-
+|144878 
+|536870912 
+|20000000 
+|[https://explorer.cha.terahash.cl/block/f53292f5fdf64fae715b92e06c0804c64541c6121f6942bc9c2afcb2d3010d4e f53292f5fdf64fae715b92e06c0804c64541c6121f6942bc9c2afcb2d3010d4e] 
+|-
+|144884
+|2
+|00000002 
+|[https://explorer.cha.terahash.cl/block/f383077bbc26e0e88bef93c58b30357bbe9c87dd65a74f3ca8546a12d07ba40c f383077bbc26e0e88bef93c58b30357bbe9c87dd65a74f3ca8546a12d07ba40c]
+|-
+|145141 
+|536870912 
+|20000000 
+|[https://explorer.cha.terahash.cl/block/c9d7f827718acccd2accda07c983fd9cccace261aa530873aa3cbfa4cd39274f c9d7f827718acccd2accda07c983fd9cccace261aa530873aa3cbfa4cd39274f]
+|-
+|145143 
+|2 
+|00000002 
+|[https://explorer.cha.terahash.cl/block/8b2551959cd16fa6431df2cb9dfb9b8754c8ebd29853b5f7b804e2bfa1b1fc5c 8b2551959cd16fa6431df2cb9dfb9b8754c8ebd29853b5f7b804e2bfa1b1fc5c]
+|-
+|145167 
+|536870915 
+|20000003 
+|[https://explorer.cha.terahash.cl/block/8ca157ba0aea00f816d75149d0e8616a5e9dfa2fdd0c380e601038a9f0692774 8ca157ba0aea00f816d75149d0e8616a5e9dfa2fdd0c380e601038a9f0692774]
+|-
+|153216 
+|536870912 
+|20000000 
+|[https://explorer.cha.terahash.cl/block/6fe0d6be185bb2249fddb09bc0bc9243f0d950fc16f8f23255ccac7c5676c02e 6fe0d6be185bb2249fddb09bc0bc9243f0d950fc16f8f23255ccac7c5676c02e]
+|}
+
+En la tabla anterior podemos observar los cambios de las versiones de los bloques minados en la Red Chaucha, y por este motivo se eligió la versión 0x30000000 para identificar a los bloques minados con el algoritmo Scrypt-N con N fijo.
+
+===Constante N===
+
+Para graficar la importancia de la constante N en el algoritmo Scrypt se utilizó el siguiente código que calcula el PoW Hash del Genesis Block con un rango de N entre 2 a 32768.
+
+<source lang="python">
+from binascii import b2a_hex, a2b_hex
+from hashlib import scrypt
+from time import time
+
+# Genesis Block
+block = '00000020b3f9f7a5a3e92ff3f164936f1efbf982449256dc6f910f790500f61f20d2d359a58ccf6f6afc4ec7e45c8a0d9bd12c5f26b5ef396061f54c7ee8a586b20f593dbdeb315e31f2001cc111e5250101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff4b032eb61004bdeb315e08810002d8010000007a657267706f6f6c2e636f6d00fabe6d6dd379f6b526a4b67c541d136570bc72819b006d76e456f808e1a427819d6d87701000000000000000000000000180d1f008000000001976a9145d0151928a6f072794bbbeef29b9d4e856ad65ff88ac00000000'
+
+header = block[:160]
+header_bin = a2b_hex(header)
+
+hashes = 1000
+
+for n in range(1, 16):
+        t0 = time()
+
+        for i in range(hashes):
+            scryptCHA_pow = scrypt(header_bin,
+                                   salt=header_bin,
+                                   n=2**n, 
+                                   r=1, 
+                                   p=1, 
+                                   dklen=32)
+
+        delay = time() - t0
+        print("%i\t%.4f seg\t%.4f H/s" % (2**n, delay, (hashes/delay)))
+
+</source>
+
+Este ejemplo se realizó con un procesador Intel i5-8250U de 1.6GHz, y los resultados se pueden observar en la siguiente tabla.
 
 {| 
 !N
@@ -119,51 +236,7 @@ void ScryptCHA(const char *input, char *output, int N)
 |83.8105
 |}
 
-==Activación==
+Con este ejercicio se pudo observar que el aumento de la constante N afecta en aproximadamente en un 45% la capacidad del Hardware para realizar un Hash, lo que reafirma la definición de ''CPU/Memory Cost'' presente en el whitepaper de Scrypt.
 
-{| 
-!nHeight
-!nVersion (dec)
-!nVersion (hex)
-!Hash
-|-
-|0
-|1
-|00000001
-|[https://explorer.cha.terahash.cl/block/6e27bffd2a104bea1c870be76aab1cce13bebb0db40606773827517da9528174 6e27bffd2a104bea1c870be76aab1cce13bebb0db40606773827517da9528174] 
-|-
-|1
-|2
-|00000002
-|[https://explorer.cha.terahash.cl/block/eadcbcb3f8960778b1c39415d1447a5cb45981ac15b269e31924f5f4701ea0e8 eadcbcb3f8960778b1c39415d1447a5cb45981ac15b269e31924f5f4701ea0e8]
-|-
-|144878 
-|536870912 
-|20000000 
-|[https://explorer.cha.terahash.cl/block/f53292f5fdf64fae715b92e06c0804c64541c6121f6942bc9c2afcb2d3010d4e f53292f5fdf64fae715b92e06c0804c64541c6121f6942bc9c2afcb2d3010d4e] 
-|-
-|144884
-|2
-|00000002 
-|[https://explorer.cha.terahash.cl/block/f383077bbc26e0e88bef93c58b30357bbe9c87dd65a74f3ca8546a12d07ba40c f383077bbc26e0e88bef93c58b30357bbe9c87dd65a74f3ca8546a12d07ba40c]
-|-
-|145141 
-|536870912 
-|20000000 
-|[https://explorer.cha.terahash.cl/block/c9d7f827718acccd2accda07c983fd9cccace261aa530873aa3cbfa4cd39274f c9d7f827718acccd2accda07c983fd9cccace261aa530873aa3cbfa4cd39274f]
-|-
-|145143 
-|2 
-|00000002 
-|[https://explorer.cha.terahash.cl/block/8b2551959cd16fa6431df2cb9dfb9b8754c8ebd29853b5f7b804e2bfa1b1fc5c 8b2551959cd16fa6431df2cb9dfb9b8754c8ebd29853b5f7b804e2bfa1b1fc5c]
-|-
-|145167 
-|536870915 
-|20000003 
-|[https://explorer.cha.terahash.cl/block/8ca157ba0aea00f816d75149d0e8616a5e9dfa2fdd0c380e601038a9f0692774 8ca157ba0aea00f816d75149d0e8616a5e9dfa2fdd0c380e601038a9f0692774]
-|-
-|153216 
-|536870912 
-|20000000 
-|[https://explorer.cha.terahash.cl/block/6fe0d6be185bb2249fddb09bc0bc9243f0d950fc16f8f23255ccac7c5676c02e 6fe0d6be185bb2249fddb09bc0bc9243f0d950fc16f8f23255ccac7c5676c02e]
-|}
+Por este motivo, propongo que la constante N se aumente de 1024 a uno de los mayores N utilizados en el ejercicio anterior, ya sea 16384 o 32768.
+
