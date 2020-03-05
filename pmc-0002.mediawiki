@@ -82,7 +82,7 @@ La activación de un cambio en la constante N presenta dos factores importantes 
 
 ===Dificultad===
 
-El cambio de la constante N producirá que la Red Chaucha deje de ser compatible con la maquinaria especifica para minar Litecoin (disponible por Cloud Mining), lo que producirá una importante variación en el poder de minado total de la red, y este evento puede ser una oportunidad para que un atacante suba artificialmente la dificultad de la red para que el bloque de activación (que debe ser minado con el nuevo algoritmo) no pueda ser descubierto nunca, produciendo un estancamiento indefinido dela Red Chaucha.
+El cambio de la constante N producirá que la Red Chaucha deje de ser compatible con la maquinaria especifica para minar Litecoin (disponible por Cloud Mining), lo que producirá una importante variación en el poder de minado total de la red, y este evento puede ser una oportunidad para que un atacante suba artificialmente la dificultad de la red para que el bloque de activación (que debe ser minado con el nuevo algoritmo) no pueda ser descubierto nunca, produciendo un estancamiento indefinido de la Red Chaucha.
 
 Por este motivo propongo establecer en '''0x30000000''' la versión de los bloques minados con el nuevo algoritmo, a modo de poder identificarlos fácilmente en el proceso de Proof of Work, y junto con esto, implementar una ventana de 24 bloques luego de la activación del fork que fije artificialmente la dificultad de la red a su minimo historico, a modo de permitir que la Red Chaucha vuelva a reajustar su dificultad naturalmente al nuevo poder de minado presente en el momento de la activación del hard fork.
 
