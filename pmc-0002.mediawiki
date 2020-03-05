@@ -11,11 +11,11 @@
 
 ==Introducción==
 
-Este documento describe una propuesta de cambio de la constante N de la función Scrypt en la Chauchera, a modo de crear un nuevo algoritmo de minería que hemos llamado ScryptCHA. Este cambio permitirá descentralizar el proceso de generación de bloques de la Red Chaucha mediante la individualización y diferenciación del algoritmo de minería de la Red Chaucha con respecto a los demás proyectos de criptomonedas activos en la actualidad.
+Este documento describe una propuesta de cambio de la constante N de la función Scrypt en la Chauchera, a modo de crear un nueva implementación que hemos llamado ScryptCHA. Este cambio permitirá descentralizar el proceso de generación de bloques de la Red Chaucha mediante la individualización y diferenciación del algoritmo de minería de la Red Chaucha con respecto a los demás proyectos de criptomonedas activos en la actualidad.
 
 ==Motivación==
 
-La Red Chaucha fue creada como un ejercicio de aprendizaje autodidacta, en donde se estableció que Chaucha sería una criptomoneda sandbox que permitiera a los usuarios aprender y desarrollar software de manera libre, gratuita, autodidacta y descentralizada.
+La Red Chaucha fue creada como un ejercicio de aprendizaje autodidacta, en donde se estableció que Chaucha sería una criptomoneda ''sandbox'' que permitiera a sus usuarios aprender y desarrollar software de manera libre, gratuita, autodidacta y descentralizada.
 
 A poco tiempo de la inauguración de la Red Chaucha observamos la necesidad de realizar una serie de actualizaciones cada cierto tiempo, a modo de asegurar que su funcionamiento se mantenga estable a través del tiempo, y por este motivo nació la idea de crear las Propuestas de Mejora para Chaucha (PMC) como una herramienta de administración de las ideas que se desean implementar en la red.
 
@@ -31,7 +31,7 @@ Por este motivo propongo individualizar la implementación del algoritmo Scrypt 
 
 En el whitepaper de la función [https://www.tarsnap.com/scrypt/scrypt.pdf Scrypt] se representa al algoritmo de la siguiente manera:
 
-''scrypt(P, S, N, r, p, dkLen) = MFcrypt<sub>HMAC_SHA256,SMix<sub>r</sub></sub>(P, S, N, p, dkLen)     ''
+''scrypt(P, S, N, r, p, dkLen) = MFcrypt<sub>HMAC_SHA256,SMix<sub>r</sub></sub>(P, S, N, p, dkLen)''
 
 En donde N se define como '''CPU/memory cost parameter''', en base a la relación entre el costo de ejecución de la función Scrypt con respecto al requisito de memoria que exige el algoritmo.
 
@@ -82,9 +82,9 @@ La activación de un cambio en la constante N presenta dos factores importantes 
 
 ===Dificultad===
 
-Cuando se reajuste la constante N la Red Chaucha dejará de ser compatible con la maquinaria especifica para minar Litecoin disponible por Cloud Mining, lo que producirá una importante variación en el poder de minado total de la red, y este evento puede ser una oportunidad para que un atacante suba artificialmente la dificultad de la red para que el bloque de activación, que debe ser minado con el nuevo algoritmo, no pueda ser descubierto nunca, haciendo que la Red Chaucha se estanque para siempre.
+El cambio de la constante N producirá que la Red Chaucha deje de ser compatible con la maquinaria especifica para minar Litecoin (disponible por Cloud Mining), lo que producirá una importante variación en el poder de minado total de la red, y este evento puede ser una oportunidad para que un atacante suba artificialmente la dificultad de la red para que el bloque de activación (que debe ser minado con el nuevo algoritmo) no pueda ser descubierto nunca, produciendo un estancamiento indefinido dela Red Chaucha.
 
-Por este motivo propongo que la versión de los bloques minados con el nuevo algoritmo sea 0x30000000, a modo de poder identificarlos fácilmente en el proceso de Proof of Work, y que además exista una ventana de 24 bloques luego de la activación del fork que fije artificialmente la dificultad de la red a su minimo historico, para que la Red Chaucha vuelva a reajustar su dificultad naturalmente al nuevo poder de minado presente luego de la activación del hard fork.
+Por este motivo propongo establecer en '''0x30000000''' la versión de los bloques minados con el nuevo algoritmo, a modo de poder identificarlos fácilmente en el proceso de Proof of Work, y junto con esto, implementar una ventana de 24 bloques luego de la activación del fork que fije artificialmente la dificultad de la red a su minimo historico, a modo de permitir que la Red Chaucha vuelva a reajustar su dificultad naturalmente al nuevo poder de minado presente en el momento de la activación del hard fork.
 
 {| 
 !nHeight
@@ -124,7 +124,7 @@ Por este motivo propongo que la versión de los bloques minados con el nuevo alg
 |[https://explorer.cha.terahash.cl/block/6fe0d6be185bb2249fddb09bc0bc9243f0d950fc16f8f23255ccac7c5676c02e 6fe0d6be185bb2249fddb09bc0bc9243f0d950fc16f8f23255ccac7c5676c02e]
 |}
 
-En la tabla anterior podemos observar los cambios de las versiones de los bloques minados en la Red Chaucha, y por este motivo se eligió la versión 0x30000000 para identificar a los bloques minados con el algoritmo Scrypt-N con N fijo.
+En la tabla anterior podemos observar los cambios de las versiones de los bloques minados en la Red Chaucha, y por este motivo se eligió la versión 0x30000000 para identificar a los bloques minados con el algoritmo Scrypt-N con N fijo. En el futuro se deberá definir la versión 0x40000000 para identificar un nuevo cambio en la estructura de los bloques en la Red Chaucha.
 
 ===Constante N===
 
@@ -231,3 +231,10 @@ Con este ejercicio se pudo observar que el aumento de la constante N afecta en a
 
 Por este motivo, propongo que la constante N se aumente de 1024 a uno de los mayores N utilizados en el ejercicio anterior, ya sea 16384 o 32768.
 
+==Conclusiones==
+
+La implementación de ScryptCHA (como una simplificación del algoritmo Scrypt-N) nos permitirá entregarle a la comunidad la posibilidad de aislar la minería de Chauchas en casos de centralización del poder de minado, y junto con esto, deja la puerta abierta a la experimentación de nuevas técnicas de ajuste automatizado de la nueva variable N para implementar en el futuro.
+
+Si esta PMC es aprobada se producirá uno de los mayores cambios en la historia de la Red Chaucha, por lo que se deben tomar una serie de precauciones para permitir que no existan problemas al momento de la activación del Hard Fork, como establecer una nueva versión de bloque, la creación de una ventana de dificultad mínima para minar bloques con el nuevo algoritmo y el nivel de costo/esfuerzo que presenta la nueva constante N en el proceso de minería.
+
+Las ideas presentadas en esta propuesta pueden variar al momento de su implementación en el código fuente de la Chauchera, pero se tendrá en cuenta la motivación principal y el objetivo definido al momento de establecer las nuevas variables en el algoritmo de minería.
